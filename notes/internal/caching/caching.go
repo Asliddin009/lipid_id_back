@@ -10,7 +10,7 @@ import (
 func NewCaching(cfg *config.Config) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", cfg.RedisHost, cfg.RedisPort), // адрес Redis сервера
-		Password: cfg.RedisPassword,                                  // no password set
+		Password: cfg.RedisPassword,                                  
 	})
 
 	// Проверяем подключение к Redis

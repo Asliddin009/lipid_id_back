@@ -40,7 +40,6 @@ func NewHandler(service service.Service, config *config.Config) *Handler {
 func (h *Handler) RegisterUser(c *gin.Context) {
 	var user models.User
 
-	// Парсим JSON из тела запроса
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(400, gin.H{
 			"error":   errors.MsgInvalidData,
@@ -49,7 +48,6 @@ func (h *Handler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	// Проверяем обязательные поля
 	if user.Username == "" || user.Password == "" {
 		c.JSON(400, gin.H{
 			"error": errors.MsgInvalidUserData,
@@ -70,7 +68,6 @@ func (h *Handler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	// Убираем пароль из ответа
 	createdUser.Password = ""
 
 	c.JSON(201, gin.H{
@@ -79,14 +76,12 @@ func (h *Handler) RegisterUser(c *gin.Context) {
 	})
 }
 
-// LoginUser обрабатывает запрос на авторизацию пользователя
 func (h *Handler) LoginUser(c *gin.Context) {
 	var loginRequest struct {
 		Username string `json:"username" binding:"required"`
 		Password string `json:"password" binding:"required"`
 	}
 
-	// Парсим JSON из тела запроса
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
 		c.JSON(400, gin.H{
 			"error":   errors.MsgInvalidData,
@@ -95,9 +90,8 @@ func (h *Handler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	// Аутентифицируем пользователя с таймаутом
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(h.cfg.DBTimeout)*time.Second)
-	// Отменяем контекст после завершения работы функции
+
 	defer cancel()
 
 	user, err := h.service.Authenticate(ctx, loginRequest.Username, loginRequest.Password)
@@ -108,10 +102,8 @@ func (h *Handler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	// Убираем пароль из ответа
 	user.Password = ""
 
-	// Генерируем JWT токены
 	accessToken, refreshToken, err := h.jwtManager.GenerateTokens(user.ID)
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -131,7 +123,7 @@ func (h *Handler) LoginUser(c *gin.Context) {
 
 // GetUserInfo обрабатывает запрос на получение информации о пользователе
 func (h *Handler) GetUserInfo(c *gin.Context) {
-	// Получаем ID пользователя из токена
+
 	userID, err := h.GetCurrentUserID(c)
 	if err != nil {
 		c.JSON(401, gin.H{
@@ -140,9 +132,7 @@ func (h *Handler) GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	// Аутентифицируем пользователя с таймаутом
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(h.cfg.DBTimeout)*time.Second)
-	// Отменяем контекст после завершения работы функции
 	defer cancel()
 
 	user, err := h.service.Read(ctx, userID)
@@ -153,7 +143,6 @@ func (h *Handler) GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	// Убираем пароль из ответа
 	user.Password = ""
 
 	c.JSON(200, gin.H{
@@ -166,9 +155,7 @@ func (h *Handler) GetCurrentUserID(c *gin.Context) (int, error) {
 	return jwtmanager.GetCurrentUserID(c)
 }
 
-// UpdateUser обрабатывает запрос на обновление данных пользователя
 func (h *Handler) UpdateUser(c *gin.Context) {
-	// Получаем ID пользователя из токена
 	userID, err := h.GetCurrentUserID(c)
 	if err != nil {
 		c.JSON(401, gin.H{
@@ -188,10 +175,8 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// Устанавливаем ID для обновления
 	updateData.ID = userID
 
-	// Аутентифицируем пользователя с таймаутом
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(h.cfg.DBTimeout)*time.Second)
 	// Отменяем контекст после завершения работы функции
 	defer cancel()
@@ -217,7 +202,6 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// Убираем пароль из ответа
 	updatedUser.Password = ""
 
 	c.JSON(200, gin.H{
@@ -228,7 +212,6 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 
 // DeleteUser обрабатывает запрос на удаление пользователя
 func (h *Handler) DeleteUser(c *gin.Context) {
-	// Получаем ID пользователя из токена
 	userID, err := h.GetCurrentUserID(c)
 	if err != nil {
 		c.JSON(401, gin.H{
@@ -237,7 +220,6 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	// Проверяем, что пользователь существует с таймаутом
 	checkCtx, checkCancel := context.WithTimeout(c.Request.Context(), time.Duration(h.cfg.DBTimeout)*time.Second)
 	defer checkCancel()
 
@@ -249,7 +231,6 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	// Удаляем пользователя из базы данных с таймаутом
 	deleteCtx, deleteCancel := context.WithTimeout(c.Request.Context(), time.Duration(h.cfg.DBTimeout)*time.Second)
 	defer deleteCancel()
 

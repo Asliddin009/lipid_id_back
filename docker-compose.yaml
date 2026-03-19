@@ -1,22 +1,14 @@
-# Конфигурация Docker Compose для сервисов приложения
 services:
-  # База данных PostgreSQL для сервиса авторизации
   db_auth:
-    # Образ PostgreSQL версии 14 с использованием Alpine Linux
     image: postgres:14-alpine
-    # Имя контейнера
     container_name: db_auth
-    # Переменные окружения для PostgreSQL
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    # Тома для хранения данных PostgreSQL
     volumes:
       - db_auth_vol:/var/lib/postgresql/data
-    # Перезапускать контейнер при сбое
     restart: always
-    # # Внутренняя сеть для связи между сервисами
     networks:
       - notes_net
 
@@ -62,7 +54,7 @@ services:
     networks:
       - notes_net
 
-  # База данных MongoDB для сервиса заметок
+  # База данных MongoDB для сервиса записей о еде и моле
   db_notes:
     container_name: db_notes
     environment:
@@ -97,20 +89,13 @@ services:
       - notes_net
 
   redis_notes:
-    # Название контейнера
-    container_name: redis_notes # Образ для контейнера который будет скачан из DockerHub
+    container_name: redis_notes 
     image: redis:7.2.4
-    # Команда для запуска Redis с паролем
     command: redis-server --requirepass ${REDIS_PASSWORD}
     environment:
-      # Переменные окружения для Redis
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-    # Настройки хранилища данных, необходим для сохранения
-    # данных в базе данных при остановке контейнера
     volumes:
       - redis_vol:/data
-    # Объявляем внутренную сеть докера, для 
-    # передачи данных между контейнерами
     networks:
       - notes_net
     depends_on:

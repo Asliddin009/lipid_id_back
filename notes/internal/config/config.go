@@ -7,9 +7,6 @@ import (
 	"strconv"
 )
 
-// Config - структура для хранения конфигурации приложения
-// Содержит параметры, необходимые для запуска сервера
-// Параметры могут быть загружены из файла, переменных окружения или других источников
 type Config struct {
 	Port          string // Порт, на котором будет запущен сервер
 	Host          string // Хост, на котором будет запущен сервер
@@ -25,15 +22,12 @@ type Config struct {
 	RedisPassword string // Пароль для подключения к Redis
 }
 
-// NewConfig - конструктор для создания новой конфигурации
 // Возвращает указатель на Config
 func NewConfig() *Config {
-	// Попытка получить порт из переменной окружения
 	port, err := getEnv("PORT")
 	if err != nil {
 		fmt.Println("Не удалось получить PORT из переменной окружения")
 	}
-	// Попытка получить хост из переменной окружения
 	host, err := getEnv("HOST")
 	if err != nil {
 		fmt.Println("Не удалось получить HOST из переменной окружения")
@@ -69,11 +63,13 @@ func NewConfig() *Config {
 		dbPort,
 		dbName,
 	)
+
 	// Параметры SSL для подключения к базе данных
 	dbSSL, err := getEnv("MONGO_USE_SSL")
 	if err != nil {
 		fmt.Println("Не удалось получить MONGO_USE_SSL из переменной окружения")
 	}
+
 	// Если SSL не используется, добавляем параметр в строку подключения
 	if dbSSL == "disable" {
 		dbDSN += "&ssl=false"
@@ -87,7 +83,6 @@ func NewConfig() *Config {
 		fmt.Println("Не удалось получить JWT_SECRET_KEY из переменной окружения")
 	}
 
-	// Попытка получить таймаут из переменной окружения
 	timeout := 10
 	if envValue, err := getEnv("SERVER_TIMEOUT"); err == nil {
 		if parsed, parseErr := strconv.Atoi(envValue); parseErr == nil {
@@ -97,8 +92,7 @@ func NewConfig() *Config {
 		fmt.Println("Не удалось получить SERVER_TIMEOUT из переменной окружения, используется 10 секунд")
 	}
 
-	// Попытка получить таймаут для базы данных из переменной окружения
-	dbTimeout := 5 // по умолчанию 5 секунд
+	dbTimeout := 5 
 	if envValue, err := getEnv("DB_TIMEOUT"); err == nil {
 		if parsed, parseErr := strconv.Atoi(envValue); parseErr == nil {
 			dbTimeout = parsed
@@ -107,18 +101,15 @@ func NewConfig() *Config {
 		fmt.Println("Не удалось получить DB_TIMEOUT из переменной окружения, используется 5 секунд")
 	}
 
-	// Попытка получить хост Redis из переменной окружения
 	redisHost, err := getEnv("REDIS_HOST")
 	if err != nil {
 		fmt.Println("Не удалось получить REDIS_HOST из переменной окружения")
 	}
 
-	// Попытка получить порт Redis из переменной окружения
 	redisPort, err := getEnv("REDIS_PORT")
 	if err != nil {
 		fmt.Println("Не удалось получить REDIS_PORT из переменной окружения")
 	}
-	// Попытка получить пароль Redis из переменной окружения
 	redisPassword, err := getEnv("REDIS_PASSWORD")
 	if err != nil {
 		fmt.Println("Не удалось получить REDIS_PASSWORD из переменной окружения")
@@ -135,19 +126,16 @@ func NewConfig() *Config {
 		DBDSN:         dbDSN,
 		DBSSL:         dbSSL,
 		JWTSecretKey:  jwtSecretKey,
-		Timeout:       timeout,       // Таймаут для операций с сервером
-		DBTimeout:     dbTimeout,     // Таймаут для операций с базой данных
-		RedisHost:     redisHost,     // Хост Redis сервера
-		RedisPort:     redisPort,     // Порт Redis сервера
-		RedisPassword: redisPassword, // Пароль для подключения к Redis
-		DB_NAME:       dbName,        // Имя базы данных
-		DB_COLLECTION: dbCollection,  // Коллекция в базе данных
+		Timeout:       timeout,       
+		DBTimeout:     dbTimeout,     
+		RedisHost:     redisHost,    
+		RedisPort:     redisPort,     
+		RedisPassword: redisPassword,
+		DB_NAME:       dbName,        
+		DB_COLLECTION: dbCollection,
 	}
 }
 
-// getEnv получает значение переменной окружения
-// Принимает ключ переменной в качестве аргумента
-// Возвращает значение переменной или ошибку, если переменная не установлена
 func getEnv(key string) (string, error) {
 	value := os.Getenv(key)
 	if value == "" {

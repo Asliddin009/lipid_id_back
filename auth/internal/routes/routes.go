@@ -18,7 +18,7 @@ func SetupRoutes(h *handler.Handler) *gin.Engine {
 
 		// Защищенные endpoints (требуют авторизации)
 		protected := auth.Group("/")
-		protected.Use(h.RequireAuth()) // Применяем middleware аутентификации
+		protected.Use(h.RequireAuth())
 		{
 			protected.GET("/user", h.GetUserInfo)
 			protected.PUT("/user", h.UpdateUser)

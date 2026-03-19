@@ -11,15 +11,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Структура сервера
 type Server struct {
-	// Конфигурация сервера
-	cfg *config.Config
-	// Маршрутизатор Gin
-	router *gin.Engine // Новое поле для маршрутизатора
+	cfg *config.Config	// Конфигурация сервера
+	router *gin.Engine  // Новое поле для маршрутизатора
 }
 
-// NewServer - конструктор сервера
 func NewServer(cfg *config.Config) (*Server, error) {
 	// Проверяем, что конфигурация не пустая
 	if cfg == nil {
@@ -66,7 +62,5 @@ func (s *Server) Serve() error {
 	// Запускаем сервер
 	address := fmt.Sprintf("%s:%s", s.cfg.Host, s.cfg.Port)
 	fmt.Printf("Сервер готов к обработке запросов на %s...\n", address)
-	// Используем s.router для запуска сервера
-	// Это позволяет нам использовать маршрутизатор, созданный в NewServer
-	return s.router.Run(address) // Новое
+	return s.router.Run(address) 
 }

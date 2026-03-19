@@ -27,27 +27,22 @@ func NewService(cfg *config.Config) (Service, error) {
 
 }
 
-// Create создает нового пользователя в базе данных
-// Он принимает контекст и указатель на модель User
-// Возвращает созданного пользователя или ошибку, если она произошла
+/// Возвращает созданного пользователя или ошибку, если она произошла
 func (p *DBService) Create(ctx context.Context, user *models.User) (*models.User, error) {
 	if user == nil {
 		return nil, gorm.ErrInvalidData
 	}
 
-	// Хешируем пароль перед сохранением в базу данных
 	hashedPassword, err := user.HashPassword(user.Password)
 	if err != nil {
 		return nil, err
 	}
 	user.Password = hashedPassword
 
-	// Используем контекст для управления временем выполнения операции
 	if err := p.db.WithContext(ctx).Create(user).Error; err != nil {
 		return nil, err
 	}
 
-	// Возвращаем созданного пользователя
 	return user, nil
 }
 
@@ -72,7 +67,6 @@ func (p *DBService) Read(ctx context.Context, id int) (*models.User, error) {
 	}
 
 	var user models.User
-	// Используем контекст для управления временем выполнения операции
 	if err := p.db.WithContext(ctx).First(&user, id).Error; err != nil {
 		return nil, err
 	}
@@ -95,7 +89,6 @@ func (p *DBService) Update(ctx context.Context, user *models.User) error {
 		user.Password = hashedPassword
 	}
 
-	// Используем контекст для управления временем выполнения операции
 	if err := p.db.WithContext(ctx).Save(user).Error; err != nil {
 		return err
 	}
@@ -110,7 +103,6 @@ func (p *DBService) ReadByUsername(ctx context.Context, username string) (*model
 	}
 
 	var user models.User
-	// Используем контекст для управления временем выполнения операции
 	if err := p.db.WithContext(ctx).Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
 	}
@@ -125,12 +117,10 @@ func (p *DBService) Authenticate(ctx context.Context, username, password string)
 	}
 
 	var user models.User
-	// Ищем пользователя по имени пользователя
 	if err := p.db.WithContext(ctx).Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
 	}
 
-	// Проверяем соответствие пароля хешу
 	if !user.CheckPassword(password, user.Password) {
 		return nil, gorm.ErrRecordNotFound // Возвращаем ошибку "не найден" для безопасности
 	}
