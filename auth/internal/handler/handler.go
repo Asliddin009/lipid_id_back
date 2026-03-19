@@ -55,6 +55,9 @@ func (h *Handler) RegisterUser(c *gin.Context) {
 		return
 	}
 
+	// Пересчитываем BMI если переданы рост и вес
+	user.CalculateBMI()
+
 	// Создаем пользователя в базе данных с таймаутом
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(h.cfg.DBTimeout)*time.Second)
 	defer cancel()
@@ -72,7 +75,7 @@ func (h *Handler) RegisterUser(c *gin.Context) {
 
 	c.JSON(201, gin.H{
 		"message": errors.MsgUserRegistered,
-		"user":    createdUser,
+		"user":    createdUser.ToProfileResponse(),
 	})
 }
 
@@ -143,11 +146,7 @@ func (h *Handler) GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	user.Password = ""
-
-	c.JSON(200, gin.H{
-		"user": user,
-	})
+	c.JSON(200, user.ToProfileResponse())
 }
 
 // GetCurrentUserID получает ID текущего пользователя из контекста (для совместимости)
@@ -164,10 +163,10 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	var updateData models.User
+	var updateReq models.UpdateProfileRequest
 
 	// Парсим JSON из тела запроса
-	if err := c.ShouldBindJSON(&updateData); err != nil {
+	if err := c.ShouldBindJSON(&updateReq); err != nil {
 		c.JSON(400, gin.H{
 			"error":   errors.MsgInvalidData,
 			"details": err.Error(),
@@ -175,13 +174,37 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	updateData.ID = userID
-
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(h.cfg.DBTimeout)*time.Second)
-	// Отменяем контекст после завершения работы функции
 	defer cancel()
 
-	err = h.service.Update(ctx, &updateData)
+	// Получаем текущего пользователя
+	user, err := h.service.Read(ctx, userID)
+	if err != nil {
+		c.JSON(404, gin.H{
+			"error": errors.MsgUserNotFound,
+		})
+		return
+	}
+
+	// Применяем частичное обновление
+	user.ApplyUpdate(&updateReq)
+
+	// Если передан новый пароль — хешируем
+	if updateReq.Password != nil && *updateReq.Password != "" {
+		hashedPassword, err := user.HashPassword(*updateReq.Password)
+		if err != nil {
+			c.JSON(500, gin.H{
+				"error": "Ошибка хеширования пароля",
+			})
+			return
+		}
+		user.Password = hashedPassword
+	}
+
+	updateCtx, updateCancel := context.WithTimeout(c.Request.Context(), time.Duration(h.cfg.DBTimeout)*time.Second)
+	defer updateCancel()
+
+	err = h.service.Update(updateCtx, user)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error":   errors.MsgDatabaseOperation,
@@ -190,23 +213,9 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// Получаем обновленного пользователя с таймаутом
-	readCtx, readCancel := context.WithTimeout(c.Request.Context(), time.Duration(h.cfg.DBTimeout)*time.Second)
-	defer readCancel()
-
-	updatedUser, err := h.service.Read(readCtx, userID)
-	if err != nil {
-		c.JSON(500, gin.H{
-			"error": errors.MsgDatabaseOperation,
-		})
-		return
-	}
-
-	updatedUser.Password = ""
-
 	c.JSON(200, gin.H{
 		"message": errors.MsgUserUpdated,
-		"user":    updatedUser,
+		"user":    user.ToProfileResponse(),
 	})
 }
 

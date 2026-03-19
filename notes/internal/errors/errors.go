@@ -62,7 +62,7 @@ const (
 	MsgDatabaseConnection = "Ошибка подключения к базе данных"
 	MsgDatabaseOperation  = "Ошибка операции с базой данных"
 	MsgDatabaseClose      = "Ошибка закрытия соединения с базой данных"
-	MsgDatabaseNotInit    = "База данных не инициализирована" 
+	MsgDatabaseNotInit    = "База данных не инициализирована"
 	MsgIterationNotes     = "Ошибка итерации по записям"
 	MsgDecodeNote         = "Ошибка декодирования записи"
 
@@ -77,4 +77,30 @@ const (
 	MsgNoteDeleted = "Запись успешно удалена"
 	MsgNoteFound   = "Запись найдена"
 	MsgNotesFound  = "Записи получены"
+
+	// Food entries
+	MsgFoodEntryCreated = "Запись о еде успешно создана"
+	MsgFoodEntryDeleted = "Запись о еде успешно удалена"
+	MsgFoodEntriesFound = "Записи о еде получены"
+	MsgFoodSummaryFound = "Статистика получена"
+
+	// Analyses
+	MsgAnalysisCreated = "Анализ успешно добавлен"
+	MsgAnalysisDeleted = "Анализ успешно удалён"
+	MsgAnalysesFound   = "Анализы получены"
+	MsgAnalysisFound   = "Анализ найден"
+
+	// Weight
+	MsgWeightEntryCreated = "Замер веса успешно добавлен"
+	MsgWeightEntryDeleted = "Замер веса успешно удалён"
+	MsgWeightEntriesFound = "Замеры веса получены"
+
+	// Devices & Notifications
+	MsgDeviceRegistered      = "Устройство зарегистрировано"
+	MsgNotificationsFound    = "Уведомления получены"
+	MsgNotificationMarkedRead = "Уведомление прочитано"
+
+	// Dashboard & Charts
+	MsgDashboardFound = "Данные дашборда получены"
+	MsgChartDataFound = "Данные графика получены"
 )
