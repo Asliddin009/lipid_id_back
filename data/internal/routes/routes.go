@@ -10,7 +10,7 @@ func SetupRouter(noteHandler *handler.Handler) *gin.Engine {
 	router := gin.Default()
 
 	// JWT middleware для всех защищённых роутов
-	auth := router.Group("")
+	auth := router.Group("/data")
 	auth.Use(noteHandler.GetJWTMiddleware())
 
 	// === Notes ===
