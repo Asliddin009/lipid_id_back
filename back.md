@@ -26,14 +26,14 @@
 
 | Метод | Эндпоинт | Описание |
 |-------|----------|----------|
-| `GET` | `/food-entries` | Список всех записей о еде (с пагинацией) |
-| `GET` | `/food-entries?date=2026-03-20` | Записи за конкретную дату |
-| `POST` | `/food-entries` | Добавить запись о еде |
-| `DELETE` | `/food-entries/{id}` | Удалить запись о еде |
-| `GET` | `/food-entries/summary?date=2026-03-20` | Дневная статистика (суммы КБЖУ) |
-| `GET` | `/food-entries/summary/weekly` | Недельная статистика |
+| `GET` | `/data/food-entries` | Список всех записей о еде (с пагинацией) |
+| `GET` | `/data/food-entries?date=2026-03-20` | Записи за конкретную дату |
+| `POST` | `/data/food-entries` | Добавить запись о еде |
+| `DELETE` | `/data/food-entries/{id}` | Удалить запись о еде |
+| `GET` | `/data/food-entries/summary?date=2026-03-20` | Дневная статистика (суммы КБЖУ) |
+| `GET` | `/data/food-entries/summary/weekly` | Недельная статистика |
 
-**Тело `POST /food-entries`:**
+**Тело `POST /data/food-entries`:**
 
 ```json
 {
@@ -48,7 +48,7 @@
 }
 ```
 
-**Ответ `GET /food-entries/summary`:**
+**Ответ `GET /data/food-entries/summary`:**
 
 ```json
 {
@@ -74,7 +74,7 @@
 
 | Метод | Эндпоинт | Описание |
 |-------|----------|----------|
-| `POST` | `/food-recognition/analyze` | Отправить фото → получить КБЖУ и название блюда |
+| `POST` | `/data/food-recognition/analyze` | Отправить фото → получить КБЖУ и название блюда |
 
 **Тело:** `multipart/form-data` с полем `image`.
 
@@ -102,7 +102,7 @@
 
 | Метод | Эндпоинт | Описание |
 |-------|----------|----------|
-| `GET` | `/home/dashboard` | Главная: рейтинг + график + последние события |
+| `GET` | `/data/home/dashboard` | Главная: рейтинг + график + последние события |
 
 **Ответ:**
 
@@ -155,12 +155,12 @@
 
 | Метод | Эндпоинт | Описание |
 |-------|----------|----------|
-| `GET` | `/charts/lipid-trend?period=7d` | Динамика липидного баланса |
-| `GET` | `/charts/lipid-trend?period=30d` | За 30 дней |
-| `GET` | `/charts/nutrition-trend?period=7d` | Динамика КБЖУ |
-| `GET` | `/charts/weight-trend?period=30d` | Динамика веса |
+| `GET` | `/data/charts/lipid-trend?period=7d` | Динамика липидного баланса |
+| `GET` | `/data/charts/lipid-trend?period=30d` | За 30 дней |
+| `GET` | `/data/charts/nutrition-trend?period=7d` | Динамика КБЖУ |
+| `GET` | `/data/charts/weight-trend?period=30d` | Динамика веса |
 
-**Ответ `GET /charts/lipid-trend`:**
+**Ответ `GET /data/charts/lipid-trend`:**
 
 ```json
 {
@@ -180,12 +180,12 @@
 
 | Метод | Эндпоинт | Описание |
 |-------|----------|----------|
-| `GET` | `/analyses` | Список всех анализов пользователя |
-| `POST` | `/analyses` | Добавить результаты анализов |
-| `GET` | `/analyses/{id}` | Детали конкретного анализа |
-| `DELETE` | `/analyses/{id}` | Удалить анализ |
+| `GET` | `/data/analyses` | Список всех анализов пользователя |
+| `POST` | `/data/analyses` | Добавить результаты анализов |
+| `GET` | `/data/analyses/{id}` | Детали конкретного анализа |
+| `DELETE` | `/data/analyses/{id}` | Удалить анализ |
 
-**Тело `POST /analyses`:**
+**Тело `POST /data/analyses`:**
 
 ```json
 {
@@ -206,11 +206,11 @@
 
 | Метод | Эндпоинт | Описание |
 |-------|----------|----------|
-| `GET` | `/weight` | История замеров веса |
-| `POST` | `/weight` | Добавить замер веса |
-| `DELETE` | `/weight/{id}` | Удалить замер |
+| `GET` | `/data/weight` | История замеров веса |
+| `POST` | `/data/weight` | Добавить замер веса |
+| `DELETE` | `/data/weight/{id}` | Удалить замер |
 
-**Тело `POST /weight`:**
+**Тело `POST /data/weight`:**
 
 ```json
 {
@@ -225,6 +225,6 @@
 
 | Метод | Эндпоинт | Описание |
 |-------|----------|----------|
-| `POST` | `/devices` | Зарегистрировать FCM/APN токен |
-| `GET` | `/notifications` | Списоке увдомлений |
-| `PATCH` | `/notifications/{id}/read` | Пометить как прочитанное |
+| `POST` | `/data/devices` | Зарегистрировать FCM/APN токен |
+| `GET` | `/data/notifications` | Списоке увдомлений |
+| `PATCH` | `/data/notifications/{id}/read` | Пометить как прочитанное |
